@@ -18,20 +18,15 @@ class Input:
 
 
 class Linear:
-    def __init__(self, in_features, out_features, parameter=None, bias=True):
+    def __init__(self, in_features, out_features, parameter=None, bias=False):
         self.z = np.ndarray
         self.in_features = in_features
         self.out_features = out_features
-        # print('linear ',in_features, out_features)
         self.weight = Parameter([in_features, out_features], parameter)
         if bias:
             self.bias = Parameter([1, out_features], parameter=parameter)
         else:
             self.bias = Parameter([1, out_features], parameter="Zero")
-
-        # print(self.weight)
-        # print(self.bias)
-        # print()
 
     def forward(self, x):
         self.z = np.add(np.dot(self.weight, x), self.bias)
@@ -58,13 +53,11 @@ class ReLU:
     def forward(self, x):
         self.activation = np.maximum(0, x)
         self.activation = self.activation.astype('float32')
-        # print('relu fwd ',self.activation.shape)
         return self.activation
 
     def backward(self, da, cache, unpack_cache):
         cached_z = unpack_cache(cache, ['z'])
         self.dz = np.array(da, copy=True)
-        # print('relu ',self.dz.shape, cached_z[0].shape)
         self.dz[cached_z[0] < 0] = 0
         return self.dz
 
@@ -90,7 +83,4 @@ class Sigmoid:
         return self.dz
 
     def get_activation(self):
-        # print('sig ', self.activation.shape)
         return self.activation
-
-
